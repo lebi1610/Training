@@ -16,6 +16,7 @@ spec:
       containers:
         - image: mysql:8.0
           name: mysql
+          platform: linux/x86_64
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: password
