@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác Thực Chứng Nhận PCI DSS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            padding: 2rem 0;
+        }
+
+        .verification-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-section h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-section .subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .form-floating label {
+            color: #6c757d;
+        }
+
+        .btn-verify {
+            background: linear-gradient(45deg, var(--secondary-color), var(--success-color));
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-verify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .result-card {
+            border-radius: 10px;
+            margin-top: 2rem;
+            padding: 1.5rem;
+        }
+
+        .result-success {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .result-error {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .certificate-details {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .detail-value {
+            color: #495057;
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-expired {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .spinner-border {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 3rem;
+            opacity: 0.8;
+        }
+
+        .security-notice {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .verification-card {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container main-container">
+        <!-- Security Notice -->
+        <div class="security-notice">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <i class="fas fa-shield-alt fa-2x"></i>
+                </div>
+                <div class="col">
+                    <h6 class="mb-1"><i class="fas fa-lock"></i> Hệ Thống Xác Thực Bảo Mật</h6>
+                    <small>Chỉ những chứng nhận có số tham chiếu hợp lệ mới có thể được xác thực</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="verification-card">
+                    <!-- Logo Section -->
+                    <div class="logo-section">
+                        <i class="fas fa-certificate fa-3x text-primary mb-3"></i>
+                        <h1>Xác Thực Chứng Nhận PCI DSS</h1>
+                        <p class="subtitle">Nhập số tham chiếu để xác thực chứng nhận của bạn</p>
+                    </div>
+
+                    <!-- Verification Form -->
+                    <form id="verificationForm">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="referenceNumber" 
+                                           placeholder="Nhập số tham chiếu" required>
+                                    <label for="referenceNumber">
+                                        <i class="fas fa-key"></i> Số Tham Chiếu *
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-verify btn-primary w-100 h-100">
+                                    <span class="btn-text">
+                                        <i class="fas fa-search"></i> Xác Thực
+                                    </span>
+                                    <span class="loading">
+                                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                                        Đang xác thực...
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="certificateId" 
+                                   placeholder="Mã chứng nhận (tùy chọn)">
+                            <label for="certificateId">
+                                <i class="fas fa-id-card"></i> Mã Chứng Nhận (tùy chọn)
+                            </label>
+                        </div>
+
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            Số tham chiếu được cung cấp bởi tổ chức cấp chứng nhận khi hoàn thành quá trình đánh giá PCI DSS
+                        </small>
+                    </form>
+
+                    <!-- Results -->
+                    <div id="results"></div>
+                </div>
+
+                <!-- Admin Access -->
+                <div class="text-center">
+                    <a href="/admin" class="btn btn-outline-light">
+                        <i class="fas fa-cog"></i> Quản Trị Hệ Thống
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; 2024 PCI DSS Certificate Verification System. All rights reserved.</p>
+            <p><small>Powered by Secure Certificate Authority</small></p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('verificationForm');
+            const resultsDiv = document.getElementById('results');
+            const btnText = document.querySelector('.btn-text');
+            const loadingText = document.querySelector('.loading');
+            const submitBtn = document.querySelector('.btn-verify');
+
+            // Check if reference number is in URL
+            const pathParts = window.location.pathname.split('/');
+            if (pathParts[1] === 'verify' && pathParts[2]) {
+                document.getElementById('referenceNumber').value = pathParts[2];
+                // Auto-submit if reference number is in URL
+                setTimeout(() => form.dispatchEvent(new Event('submit')), 500);
+            }
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const referenceNumber = document.getElementById('referenceNumber').value.trim();
+                const certificateId = document.getElementById('certificateId').value.trim();
+
+                if (!referenceNumber) {
+                    showError('Vui lòng nhập số tham chiếu');
+                    return;
+                }
+
+                // Show loading state
+                btnText.style.display = 'none';
+                loadingText.style.display = 'inline-block';
+                submitBtn.disabled = true;
+
+                try {
+                    const response = await fetch('/api/public/verify', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            reference_number: referenceNumber,
+                            certificate_id: certificateId || undefined
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showSuccess(data.certificate);
+                    } else {
+                        showError(data.message);
+                    }
+                } catch (error) {
+                    console.error('Verification error:', error);
+                    showError('Lỗi kết nối. Vui lòng thử lại sau.');
+                } finally {
+                    // Hide loading state
+                    btnText.style.display = 'inline-block';
+                    loadingText.style.display = 'none';
+                    submitBtn.disabled = false;
+                }
+            });
+
+            function showSuccess(certificate) {
+                const expiryDate = new Date(certificate.expiry_date);
+                const issueDate = new Date(certificate.issue_date);
+                const isExpired = expiryDate < new Date();
+
+                resultsDiv.innerHTML = `
+                    <div class="result-card result-success">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-check-circle fa-2x me-3"></i>
+                            <div>
+                                <h5 class="mb-1">Chứng nhận hợp lệ!</h5>
+                                <small>Chứng nhận đã được xác thực thành công</small>
+                            </div>
+                        </div>
+                        
+                        <div class="certificate-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Mã chứng nhận:</span>
+                                <span class="detail-value"><strong>${certificate.certificate_id}</strong></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Công ty:</span>
+                                <span class="detail-value">${certificate.company_name}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Loại chứng nhận:</span>
+                                <span class="detail-value">${certificate.certificate_type}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Ngày cấp:</span>
+                                <span class="detail-value">${formatDate(issueDate)}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Ngày hết hạn:</span>
+                                <span class="detail-value">${formatDate(expiryDate)}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Trạng thái:</span>
+                                <span class="detail-value">
+                                    <span class="status-badge ${isExpired ? 'status-expired' : 'status-active'}">
+                                        ${isExpired ? 'Đã hết hạn' : 'Còn hiệu lực'}
+                                    </span>
+                                </span>
+                            </div>
+                            ${certificate.assessment_level ? `
+                            <div class="detail-row">
+                                <span class="detail-label">Cấp độ đánh giá:</span>
+                                <span class="detail-value">${certificate.assessment_level}</span>
+                            </div>` : ''}
+                            ${certificate.qsa_company ? `
+                            <div class="detail-row">
+                                <span class="detail-label">Công ty đánh giá:</span>
+                                <span class="detail-value">${certificate.qsa_company}</span>
+                            </div>` : ''}
+                        </div>
+                        
+                        <div class="mt-3 text-center">
+                            <small><i class="fas fa-info-circle"></i> Thông tin này được xác thực vào ${new Date().toLocaleString('vi-VN')}</small>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function showError(message) {
+                resultsDiv.innerHTML = `
+                    <div class="result-card result-error">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-times-circle fa-2x me-3"></i>
+                            <div>
+                                <h5 class="mb-1">Xác thực thất bại</h5>
+                                <p class="mb-0">${message}</p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <small><i class="fas fa-exclamation-triangle"></i> Vui lòng kiểm tra lại số tham chiếu và thử lại</small>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function formatDate(date) {
+                return date.toLocaleDateString('vi-VN', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+        });
+    </script>
+</body>
+</html>
