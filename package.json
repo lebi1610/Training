@@ -1,0 +1,32 @@
+{
+  "name": "pci-dss-certificate-system",
+  "version": "1.0.0",
+  "description": "Hệ thống quản lý và xác thực chứng nhận PCI DSS",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "init-db": "node scripts/init-database.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.6.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.0",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "express-rate-limit": "^6.8.0",
+    "dotenv": "^16.3.1",
+    "joi": "^17.9.2",
+    "qrcode": "^1.5.3",
+    "pdf-lib": "^1.17.1",
+    "nodemailer": "^6.9.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["pci-dss", "certificate", "verification", "security"],
+  "author": "PCI DSS Certification Authority",
+  "license": "MIT"
+}
